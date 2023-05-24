@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Product, ProductType } from "../Entities/Product";
 import useLoadCategories from "./useCategories";
 
@@ -9,16 +9,7 @@ export default function useLoadProducts() {
 
     const { categories } = useLoadCategories();
 
-    useEffect(() => {
-      
-      loadProducts()
-    
-      return () => {
-        console.log("Unmounted");
-      };
-    }, [categories]);
-
-    const loadProducts = async () => {
+    const loadProducts = useCallback(async () => {
 
       const productsList : Array<Product> = [];
       
@@ -51,7 +42,16 @@ export default function useLoadProducts() {
       setProductsLoading(false)
       
       setProducts(productsList)
-    }
+    }, [categories]);
+
+    useEffect(() => {
+      
+      loadProducts()
+    
+      return () => {
+        console.log("Unmounted");
+      };
+    }, [categories, loadProducts]);
 
     const addProduct = (product: Product) => {
       const productsList = products;

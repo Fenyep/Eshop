@@ -1,20 +1,27 @@
-import {
-    Pagination
-  } from '@windmill/react-ui'
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import { CiSearch } from 'react-icons/ci';
 import Button from '../../Components/Buttons/Button';
+import CustomPagination from '../../Components/Pagination/CustomPagination';
 import useLoadProducts from '../../hooks/useProducts';
-import { formatDate } from '../../Utils/utils';
+import { formatDate, monthOptions, yearOptions } from '../../Utils/utils';
 
 const StocksPage = () => {
 
-    const { products } = useLoadProducts();  
+    const { products, refreshProducts } = useLoadProducts();  
 
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const pageSize = 5;
+
+    
+    const handlePageChange = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
+    };
+    
     const [codeFilterValue, setCodeFilterValue] = useState("")
-
+    
     const [monthFilterValue, setMonthFilterValue] = useState("")
-
+    
     const [yearFilterValue, setYearFilterValue] = useState("");
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -31,28 +38,7 @@ const StocksPage = () => {
         console.log(e.target.value);
     }
 
-    const monthOptions = [
-        { value:"01", label: "January"},
-        { value:"02", label: "February"},
-        { value:"03", label: "March"},
-        { value:"04", label: "April"},
-        { value:"05", label: "May"},
-        { value:"06", label: "June"},
-        { value:"07", label: "July"},
-        { value:"08", label: "August"},
-        { value:"09", label: "September"},
-        { value:"10", label: "October"},
-        { value:"11", label: "November"},
-        { value:"12", label: "December"},
-    ];
-
-    const currentYear = new Date().getFullYear();
-    const yearOptions = Array.from({ length: 20 }, (_, index) => {
-      const year = currentYear - index;
-      return { value: String(year), label: String(year) };
-    });
-
-    const filteredProducts = (code: string, month: string, year: string) => {
+    const filteredProducts = useCallback((code: string, month: string, year: string) => {
         let fetchedProducts = products;
 
         if(code != "") {
@@ -60,15 +46,17 @@ const StocksPage = () => {
         }
 
         if(year != "") {
-            fetchedProducts = fetchedProducts?.filter(elmt => `${formatDate(elmt.createdAt).year}` === yearFilterValue);
+            fetchedProducts = fetchedProducts?.filter(elmt => `${formatDate(elmt.createdAt).year}` === year);
         }
 
         if(month != "") {
-          fetchedProducts = fetchedProducts?.filter(elmt => `${formatDate(elmt.createdAt).month}` === monthFilterValue);
+          fetchedProducts = fetchedProducts?.filter(elmt => `${formatDate(elmt.createdAt).month}` === month);
         }
 
         return fetchedProducts;
-    }
+    }, [products])
+
+    const totalPages = useMemo(() => Math.ceil(filteredProducts(codeFilterValue, monthFilterValue, yearFilterValue)?.length ?? 0 / pageSize), [codeFilterValue, monthFilterValue, yearFilterValue, filteredProducts])
 
     return (
         <div className='text-black w-full justify-start'>
@@ -80,8 +68,7 @@ const StocksPage = () => {
                 <div className="w-full flex justify-between items-center mt-20 mb-2">
                     <div className="flex items-center">
                         <Button otherStyles="mr-4 font-semibold text-blue-500 text-sm" typed="outlined" action={() => console.log("Print")}>Print</Button>
-                        <Button otherStyles="font-medium" typed="filled" action={() => {console.log("");
-                        }}>Refresh</Button>
+                        <Button otherStyles="font-medium" typed="filled" action={() => refreshProducts()}>Refresh</Button>
                     </div>
                     <div className="flex">
                         <select value={monthFilterValue || ''} onChange={handleMonthSelectChange} className='mr-2' name="month" id="">
@@ -120,8 +107,8 @@ const StocksPage = () => {
                                 <th className='text-sm px-10 py-3'>Date</th>
                             </tr>
                         </thead>
-                        <tbody>
-                        {filteredProducts(codeFilterValue, monthFilterValue, yearFilterValue)?.map((elmt, index) => (
+                        <tbody className='w-full'>
+                        { products && products.length > 0 ? filteredProducts(codeFilterValue, monthFilterValue, yearFilterValue)?.map((elmt, index) => (
                             <tr className={`${index % 2 != 0 ? 'bg-gray-200 hover:bg-gray-300' : ""}`}>
                                 <td className='border-2 py-2'>
                                     <div className="flex w-full items-center text-sm">
@@ -150,11 +137,11 @@ const StocksPage = () => {
                                 <td className='border-2 py-2'>
                                     <div className="flex w-full items-center text-sm">
                                         {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
-                                        <span className="font-medium text-center w-full ml-2">{elmt.categories?.map((e, index) => (
-                                            
-                                            elmt.categories && index < elmt.categories?.length - 1 ? `${e.label}, ` : `${e.label}`
-                                            
+                                        <span className={`font-medium text-center w-full ml-2 ${elmt.categories && elmt.categories.length > 0 ? "" : 'flex justify-center'}`}>{ elmt.categories && elmt.categories.length > 0 ? elmt.categories.map((e, index) => (
+                                                elmt.categories && index < elmt.categories?.length - 1 ? `${e.label}, ` : `${e.label}`
                                             )
+                                        ) : (
+                                            <div className='w-10 h-10 rounded-full bg-transparent border-dashed animate-spin border-4 border-slate-700 '></div>
                                         )}
                                         </span>
                                     </div>
@@ -172,12 +159,25 @@ const StocksPage = () => {
                                     </div>
                                 </td>
                             </tr>
-                        ))}
+                        )) : 
+                        (
+                            <tr className='border-4 animate-pulse w-full'>
+                                {[1,2,3,4,5,6,7].map(() => (
+                                    <td className='bg-gray-300 w-full py-4'>
+                                    </td>
+                                ))}
+                            </tr>
+                        )
+                        }
                         </tbody>
                     </table>
-                <Pagination totalResults={products?.length} resultsPerPage={2} onChange={() => {
+                    <div className='w-full mt-4 flex justify-end'>
+                        <CustomPagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                    </div>
+                
+                {/* <Pagination totalResults={products?.length} resultsPerPage={2} onChange={() => {
                         console.log("clicked");
-                }} label="Table navigation" />
+                }} label="Table navigation" /> */}
                 </div>
                 
                 
