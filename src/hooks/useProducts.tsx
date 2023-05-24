@@ -41,7 +41,7 @@ export default function useLoadProducts() {
             unitPrice: 10,
             images: [],
             categories: categories ?? [],
-            createdAt: new Date(),
+            createdAt: new Date(`${2024-elmt}-${10-elmt}-15`),
             modifiedAt: new Date(),
         };
 

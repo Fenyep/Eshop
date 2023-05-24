@@ -1,34 +1,24 @@
 import {
-    TableContainer,
-    Table,
-    TableHeader,
-    TableBody,
-    TableRow,
-    TableCell,
-    TableFooter,
     Pagination
   } from '@windmill/react-ui'
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { CiSearch } from 'react-icons/ci';
 import Button from '../../Components/Buttons/Button';
-import { Product } from '../../Entities/Product';
 import useLoadProducts from '../../hooks/useProducts';
 import { formatDate } from '../../Utils/utils';
 
 const StocksPage = () => {
 
-    const [fetchedProducts, setFetchedProducts] = useState<Array<Product>>([]);
-
     const { products } = useLoadProducts();  
 
-    const [filterValue, setFilterValue] = useState("")
+    const [codeFilterValue, setCodeFilterValue] = useState("")
 
-    const [monthFilterValue, setMonthFilterValue] = useState("all")
+    const [monthFilterValue, setMonthFilterValue] = useState("")
 
-    const [yearFilterValue, setYearFilterValue] = useState(String(new Date().getFullYear()));
+    const [yearFilterValue, setYearFilterValue] = useState("");
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setFilterValue(e.target.value);
+        setCodeFilterValue(e.target.value);
     }
 
     const handleMonthSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -40,16 +30,6 @@ const StocksPage = () => {
         setYearFilterValue(e.target.value);
         console.log(e.target.value);
     }
-
-    useEffect(() => {
-
-        if(products && products?.length > 0) {
-            setFetchedProducts(products)
-        }
-        return () => {
-            console.log("Unmounted");
-        }
-    }, [products]);
 
     const monthOptions = [
         { value:"01", label: "January"},
@@ -72,6 +52,24 @@ const StocksPage = () => {
       return { value: String(year), label: String(year) };
     });
 
+    const filteredProducts = (code: string, month: string, year: string) => {
+        let fetchedProducts = products;
+
+        if(code != "") {
+            fetchedProducts = fetchedProducts?.filter(elmt => elmt.code === code);
+        }
+
+        if(year != "") {
+            fetchedProducts = fetchedProducts?.filter(elmt => `${formatDate(elmt.createdAt).year}` === yearFilterValue);
+        }
+
+        if(month != "") {
+          fetchedProducts = fetchedProducts?.filter(elmt => `${formatDate(elmt.createdAt).month}` === monthFilterValue);
+        }
+
+        return fetchedProducts;
+    }
+
     return (
         <div className='text-black w-full justify-start'>
             <div className="categories w-full">
@@ -93,6 +91,7 @@ const StocksPage = () => {
                             ))}
                         </select>
                         <select value={yearFilterValue} onChange={handleYearSelectChange} className='mr-2' name="year" id="">
+                            <option value="" selected>All years</option>
                             {yearOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
@@ -103,85 +102,85 @@ const StocksPage = () => {
                             <span className="text-gray-500 text-3xl mr-1">
                                 <CiSearch />
                             </span>
-                            <input value={filterValue} onChange={(e) => {handleChange(e)}} type="text" className="input-default bg-gray-200 p-1" placeholder="Product code" />
+                            <input value={codeFilterValue} onChange={(e) => {handleChange(e)}} type="text" className="input-default bg-gray-200 p-1" placeholder="Product code" />
                         </div>
                     </div>
                 </div>
+
+                <div className='border-2 w-full mt-4 px-2 py-3 rounded-lg'>
+                    <table className="p-4 w-full rounded-lg">
+                        <thead className=''>
+                            <tr className='text-white bg-slate-950'>
+                                <th className='text-sm px-10 py-3'>Product Name</th>
+                                <th className='text-sm px-10 py-3'>Product Code</th>
+                                <th className='text-sm px-10 py-3'>Administrator</th>
+                                <th className='text-sm px-10 py-3'>Quantity</th>
+                                <th className='text-sm px-10 py-3'>Category</th>
+                                <th className='text-sm px-10 py-3'>Actions</th>
+                                <th className='text-sm px-10 py-3'>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {filteredProducts(codeFilterValue, monthFilterValue, yearFilterValue)?.map((elmt, index) => (
+                            <tr className={`${index % 2 != 0 ? 'bg-gray-200 hover:bg-gray-300' : ""}`}>
+                                <td className='border-2 py-2'>
+                                    <div className="flex w-full items-center text-sm">
+                                        {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
+                                        <span className="font-medium text-center w-full ml-2">{elmt.name}</span>
+                                    </div>
+                                </td>
+                                <td className='border-2 py-2'>
+                                    <div className="flex w-full items-center text-sm">
+                                        {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
+                                        <span className="font-medium text-center w-full ml-2">{elmt.code}</span>
+                                    </div>
+                                </td>
+                                <td className='border-2 py-2'>
+                                    <div className="flex w-full items-center text-sm">
+                                        {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
+                                        <span className="font-medium text-center w-full ml-2">Administrator</span>
+                                    </div>
+                                </td>
+                                <td className='border-2 py-2'>
+                                    <div className="flex w-full items-center text-sm">
+                                        {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
+                                        <span className="font-medium text-center w-full ml-2">{elmt.quantity}</span>
+                                    </div>
+                                </td>
+                                <td className='border-2 py-2'>
+                                    <div className="flex w-full items-center text-sm">
+                                        {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
+                                        <span className="font-medium text-center w-full ml-2">{elmt.categories?.map((e, index) => (
+                                            
+                                            elmt.categories && index < elmt.categories?.length - 1 ? `${e.label}, ` : `${e.label}`
+                                            
+                                            )
+                                        )}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td className='border-2 py-2'>
+                                    <div className="flex w-full items-center text-sm">
+                                        {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
+                                        <span className="font-medium text-center w-full ml-2">Remove, Update</span>
+                                    </div>
+                                </td>
+                                <td className='border-2 py-2'>
+                                    <div className="flex w-full items-center text-sm">
+                                        {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
+                                        <span className="font-medium text-center w-full ml-2">{formatDate(elmt.createdAt).date}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                <Pagination totalResults={products?.length} resultsPerPage={2} onChange={() => {
+                        console.log("clicked");
+                }} label="Table navigation" />
+                </div>
                 
-                <TableContainer>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableCell>Product Name</TableCell>
-                                <TableCell>Product Code</TableCell>
-                                <TableCell>Administrator</TableCell>
-                                <TableCell>Quantity</TableCell>
-                                <TableCell>Category</TableCell>
-                                <TableCell>Actions</TableCell>
-                                <TableCell>Date</TableCell>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {fetchedProducts.map(elmt => (
-                                <TableRow>
-                                    <TableCell>
-                                        <div className="flex items-center text-sm">
-                                            {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
-                                            <span className="font-semibold ml-2">{elmt.name}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center text-sm">
-                                            {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
-                                            <span className="font-semibold ml-2">{elmt.code}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center text-sm">
-                                            {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
-                                            <span className="font-semibold ml-2">Administrator</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center text-sm">
-                                            {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
-                                            <span className="font-semibold ml-2">{elmt.quantity}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center text-sm">
-                                            {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
-                                            <span className="font-semibold ml-2">{elmt.categories?.map((e, index) => (
-                                                
-                                                elmt.categories && index < elmt.categories?.length - 1 ? `${e.label}, ` : `${e.label}`
-                                                
-                                                )
-                                            )}
-                                            </span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center text-sm">
-                                            {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
-                                            <span className="font-semibold ml-2">Remove, Update</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center text-sm">
-                                            {/* <Avatar src="/img/avatar-1.jpg" alt="Judith" /> */}
-                                            <span className="font-semibold ml-2">{formatDate(elmt.createdAt)}</span>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                    <TableFooter>
-                        <Pagination totalResults={products?.length} resultsPerPage={2} onChange={() => {
-                            console.log("clicked");
-                        }} label="Table navigation" />
-                    </TableFooter>
-                </TableContainer>
+                
 
                 {/* <div className="w-full grid grid-cols-3 gap-4 py-4" >
 
