@@ -6,8 +6,8 @@ export class Product {
     providerCode? : string
     unitPrice: number
     description: string
-    images: Array<string>
-    categories: Array<Category>
+    images?: Array<string>
+    categories?: Array<Category>
 
     constructor(data: Product) {
         this.code = data.code;
@@ -26,8 +26,8 @@ export interface ProductInterface {
     providerCode? : string
     unitPrice: number
     description: string
-    images: Array<string>
-    categories: Array<Category>
+    images?: Array<string>
+    categories?: Array<Category>
 }
 
 export type ProductType = {
@@ -36,6 +36,6 @@ export type ProductType = {
     providerCode? : string
     unitPrice: number
     description: string
-    images: Array<string>
-    categories: Array<Category>
+    images?: Array<string>
+    categories?: Array<Category>
 }

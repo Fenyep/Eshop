@@ -7,12 +7,13 @@ import Skeleton from "../../Components/Skeleton/Skeleton";
 import Button from "../../Components/Buttons/Button";
 import useForms from "../../hooks/useForms";
 import FormsContainer from "../../Components/Forms/FormsContainer";
+import ProductCard from "./ProductCard";
 
 const ProductsPage = () => {
 
     const maskContext = useContext(MaskContext);
 
-    const { products, refreshProducts } = useLoadProducts();
+    const { products, refreshProducts, removeProduct } = useLoadProducts();
 
     const { dispatch, formState } = useForms();
 
@@ -64,26 +65,14 @@ const ProductsPage = () => {
                             {filterValue.length > 0 ? (
                                 <>
                                     {products?.filter(elmt => elmt.name.includes(filterValue) || elmt.description?.includes(filterValue) || elmt.code?.includes(filterValue)).map(e => (
-                                        <div className="w-auto bg-blue-500 p-2 rounded-md">
-                                            <div className="w-full h-[300px] bg-red-500 rounded-md">.</div>
-                                            <div className="flex flex-col mt-4">
-                                                <span className="text-sm font-medium text-gray-600">{e.name} </span>
-                                                <span className="text-md font-medium">{e.description} </span>
-                                            </div>
-                                        </div>
+                                        <ProductCard product={e} deleteCallback={removeProduct} />
                                     ))}
                                 </>
                             )
 
                             : 
                                 products?.map(elmt => (
-                                    <div className="w-auto bg-blue-500 p-2 rounded-md">
-                                        <div className="w-full h-[300px] bg-red-500 rounded-md">.</div>
-                                        <div className="flex flex-col mt-4">
-                                            <span className="text-sm font-medium text-gray-600">{elmt.name} </span>
-                                            <span className="text-md font-medium">{elmt.description} </span>
-                                        </div>
-                                    </div>
+                                    <ProductCard product={elmt} deleteCallback={removeProduct} />
                                 ))
                             }
                         </>

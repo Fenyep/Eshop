@@ -44,19 +44,47 @@ export default function useLoadProducts() {
         productsList.push(new Product(newProduct));
       });
 
-      
       setProductsLoading(false)
       
       setProducts(productsList)
-
     }
+
+    const addProduct = (product: Product) => {
+      const productsList = products;
+      productsList?.push(product);
+      setProducts(productsList);
+    }
+
+    const removeProduct = (code: string) => {
+      const filteredProductsList = products?.filter(elmt => elmt.code != code);
+      setProducts(filteredProductsList);
+    }
+
+    const updateProduct = (index: number, newProduct: Product) => {
+
+      const productsList = products;
+
+      (productsList as Product[])[index].code = newProduct.code;
+      (productsList as Product[])[index].categories = newProduct.categories;
+      (productsList as Product[])[index].providerCode = newProduct.providerCode;
+      (productsList as Product[])[index].description = newProduct.description;
+      (productsList as Product[])[index].images = newProduct.images;
+      (productsList as Product[])[index].unitPrice = newProduct.unitPrice;
+      (productsList as Product[])[index].name = newProduct.name;
+
+      setProducts(productsList);
+    }
+
 
     return {
         products: products,
         setProducts: setProducts,
         productsLoading: productsLoading,
         setProductsLoading: setProductsLoading,
-        refreshProducts: loadProducts
+        refreshProducts: loadProducts,
+        addProduct: addProduct,
+        removeProduct: removeProduct,
+        updateProduct: updateProduct,
     }
     
 }
