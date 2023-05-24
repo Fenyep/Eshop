@@ -60,7 +60,7 @@ const ProductsPage = () => {
                 </div>
                 <div className="w-full grid grid-cols-3 gap-4 py-4" >
 
-                    {products && products.length > 0 ? (
+                    {products ? (
                         <>
                             {filterValue.length > 0 ? (
                                 <>

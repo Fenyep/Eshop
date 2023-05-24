@@ -16,7 +16,6 @@ export default function useLoadProducts() {
     }, []);
 
     const loadProducts = async () => {
-      setProducts([]);
 
       const productsList : Array<Product> = [];
       
@@ -74,7 +73,6 @@ export default function useLoadProducts() {
 
       setProducts(productsList);
     }
-
 
     return {
         products: products,

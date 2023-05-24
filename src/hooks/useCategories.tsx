@@ -16,7 +16,7 @@ export default function useLoadCategories() {
     }, []);
 
     const loadCategories = async () => {
-      setCategories([]);
+      // setCategories([]);
 
       const categoriesList : Array<Category> = [];
       
@@ -42,7 +42,28 @@ export default function useLoadCategories() {
       setCategoriesLoading(false)
 
       setCategories(categoriesList)
+    }
 
+    const addCategory = (category: Category) => {
+      const categoriesList = categories;
+      categoriesList?.push(category);
+      setCategories(categoriesList);
+    }
+
+    const removeCategory = (code: string) => {
+      const filteredCategoriesList = categories?.filter(elmt => elmt.code != code);
+      setCategories(filteredCategoriesList);
+    }
+
+    const updateCategory = (index: number, newCategory: Category) => {
+
+      const categoriesList = categories;
+
+      (categoriesList as Category[])[index].code = newCategory.code;
+      (categoriesList as Category[])[index].label = newCategory.label;
+      (categoriesList as Category[])[index].description = newCategory.description;
+
+      setCategories(categoriesList);
     }
 
     return {
@@ -50,7 +71,10 @@ export default function useLoadCategories() {
         setCategories: setCategories,
         categoriesLoading: categoriesLoading,
         setCategoriesLoading: setCategoriesLoading,
-        refreshCategories: loadCategories
+        refreshCategories: loadCategories,
+        addCategory: addCategory,
+        removeCategory: removeCategory,
+        updateCategory: updateCategory
     }
     
 }

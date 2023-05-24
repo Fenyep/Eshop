@@ -8,12 +8,13 @@ import Skeleton from "../../Components/Skeleton/Skeleton";
 import Button from "../../Components/Buttons/Button";
 import useForms from "../../hooks/useForms";
 import FormsContainer from "../../Components/Forms/FormsContainer";
+import CategoryCard from "./CategoryCard";
 
 const CategoriesPage = () => {
 
     const maskContext = useContext(MaskContext);
 
-    const { categories, refreshCategories } = useLoadCategories();
+    const { categories, refreshCategories, removeCategory } = useLoadCategories();
 
     const { dispatch, formState } = useForms();
 
@@ -22,6 +23,8 @@ const CategoriesPage = () => {
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setFilterValue(e.target.value);
     }
+
+    console.log(categories);
 
     return (
         <div className="text-black w-full justify-start">
@@ -65,31 +68,19 @@ const CategoriesPage = () => {
                 </div>
                 <div className="w-full grid grid-cols-3 gap-4 py-4" >
 
-                    {categories && categories.length > 0 ? (
+                    {categories ? (
                         <>
                             {filterValue.length > 0 ? (
                                 <>
                                     {categories?.filter(elmt => elmt.label.includes(filterValue) || elmt.description?.includes(filterValue) || elmt.code?.includes(filterValue)).map(e => (
-                                        <div className="w-auto bg-blue-500 p-2 rounded-md">
-                                            <div className="w-full h-[300px] bg-red-500 rounded-md">.</div>
-                                            <div className="flex flex-col mt-4">
-                                                <span className="text-sm font-medium text-gray-600">{e.label} </span>
-                                                <span className="text-md font-medium">{e.description} </span>
-                                            </div>
-                                        </div>
+                                        <CategoryCard category={e} deleteCallback={removeCategory} />
                                     ))}
                                 </>
                             )
 
                             : 
                                 categories?.map(elmt => (
-                                    <div className="w-auto bg-blue-500 p-2 rounded-md">
-                                        <div className="w-full h-[300px] bg-red-500 rounded-md">.</div>
-                                        <div className="flex flex-col mt-4">
-                                            <span className="text-sm font-medium text-gray-600">{elmt.label} </span>
-                                            <span className="text-md font-medium">{elmt.description} </span>
-                                        </div>
-                                    </div>
+                                    <CategoryCard category={elmt} deleteCallback={removeCategory} />
                                 ))
                             }
                         </>
