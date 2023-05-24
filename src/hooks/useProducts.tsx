@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Product, ProductType } from "../Entities/Product";
+import useLoadCategories from "./useCategories";
 
 export default function useLoadProducts() {
     const [products, setProducts] = useState<Array<Product>>();
 
     const [productsLoading, setProductsLoading] = useState(false);
+
+    const { categories } = useLoadCategories();
 
     useEffect(() => {
       
@@ -13,7 +16,7 @@ export default function useLoadProducts() {
       return () => {
         console.log("Unmounted");
       };
-    }, []);
+    }, [categories]);
 
     const loadProducts = async () => {
 
@@ -37,7 +40,7 @@ export default function useLoadProducts() {
             providerCode: `${elmt}`,
             unitPrice: 10,
             images: [],
-            categories: [],
+            categories: categories ?? [],
             createdAt: new Date(),
             modifiedAt: new Date(),
         };

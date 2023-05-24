@@ -30,10 +30,10 @@ const ProductsPage = () => {
                     {formState.payload}
                 </FormsContainer>
             : null} 
-            <div className="categories w-full">
+            <div className="products w-full">
                 <div className="mt-10 flex flex-col">
                     <span className="font-semibold text-4xl">Products</span>
-                    <span className="font-small text-lg text-gray-500">Find here our list of products.</span>
+                    <span className="font-small text-lg text-gray-500">Find here our catalogue of products.</span>
                 </div>
                 <div className="w-full flex justify-between items-center mt-20 mb-2">
                     <div className="flex items-center">

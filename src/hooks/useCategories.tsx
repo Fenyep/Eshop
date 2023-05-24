@@ -33,7 +33,9 @@ export default function useLoadCategories() {
         const newCategory : CategoryType = {
             label: `Categorie label ${elmt}`,
             description: `Categorie title ${elmt}`,
-            code: `${elmt}`
+            code: `${elmt}`,
+            createdAt: new Date(),
+            modifiedAt: new Date()
         };
 
         categoriesList.push(new Category(newCategory));
