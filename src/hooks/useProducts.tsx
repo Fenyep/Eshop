@@ -37,7 +37,9 @@ export default function useLoadProducts() {
             providerCode: `${elmt}`,
             unitPrice: 10,
             images: [],
-            categories: []
+            categories: [],
+            createdAt: new Date(),
+            modifiedAt: new Date(),
         };
 
         productsList.push(new Product(newProduct));
