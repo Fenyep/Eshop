@@ -67,7 +67,7 @@ const StocksPage = () => {
                 </div>
                 <div className="w-full flex justify-between items-center mt-20 mb-2">
                     <div className="flex items-center">
-                        <Button otherStyles="mr-4 font-semibold text-blue-500 text-sm" typed="outlined" action={() => console.log("Print")}>Print</Button>
+                        <Button otherStyles="mr-2 font-semibold text-blue-500 text-sm" typed="outlined" action={() => console.log("Print")}>Print</Button>
                         <Button otherStyles="font-medium" typed="filled" action={() => refreshProducts()}>Refresh</Button>
                     </div>
                     <div className="flex">

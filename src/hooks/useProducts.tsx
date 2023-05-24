@@ -79,12 +79,18 @@ export default function useLoadProducts() {
       setProducts(productsList);
     }
 
+    const refreshProducts = async () => {
+
+      setProducts(undefined)
+      loadProducts();
+    }
+
     return {
         products: products,
         setProducts: setProducts,
         productsLoading: productsLoading,
         setProductsLoading: setProductsLoading,
-        refreshProducts: loadProducts,
+        refreshProducts: refreshProducts,
         addProduct: addProduct,
         removeProduct: removeProduct,
         updateProduct: updateProduct,
